@@ -77,19 +77,19 @@ class VmcUnelventModbusCollector(diamond.collector.Collector):
 
 	result = client.read_input_registers(address=0x00, count=41, unit=0x01)
 
-	tint=result.registers[21]/10.0)
-	tout=result.registers[22]/10.0)
-	text=result.registers[23]/10.0)
-	timp=result.registers[24]/10.0)
+	tint=result.registers[21]/10.0
+	tout=result.registers[22]/10.0
+	text=result.registers[23]
+	if(text>32768):
+		text=(text-65536)/10.0
+	else:
+		text=text/10.0
+	timp=result.registers[24]/10.0
 
-	if tint != 6553:
-	        self.publish("tint", tint)
-	if tout != 6553:
-		self.publish("tout", tout)
-	if text != 6553:
-		self.publish("text", text)
-	if timp != 6553:
-		self.publish("timp", timp)
+        self.publish("tint", tint, precision=1)
+	self.publish("tout", tout, precision=1)
+	self.publish("text", text, precision=1)
+	self.publish("timp", timp, precision=1)
 
         self.publish("airflow", result.registers[16])
         self.publish("bypass", result.registers[25])
